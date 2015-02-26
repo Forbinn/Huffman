@@ -5,9 +5,10 @@ In order to compile the program you just have to type **make** in the root direc
 
 ### Usage
 
-    ./ha file
+    ./ha [-h] [-c | -d] -i input_file [-o output_file]
 
-If you do this the program will compress the file under the name **file.hc** and decompress it under the name **file.hc.hcd**.
+The **-c** option is used to compress a file and the **-d** option is used to decompress a file.
+For more information type *./ha -h*.
 
 The compressed file can be bigger than the uncompressed file because of the overhead caused by the *huffman tree*. This can occurs if the size of the uncompressed file is low (< 1 kB).
 
