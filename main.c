@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Mon Feb 23 17:24:41 2015 vincent leroy
-** Last update Thu Feb 26 00:03:31 2015 vincent leroy
+** Last update Thu Feb 26 13:36:56 2015 vincent leroy
 */
 
 #include <string.h>
@@ -30,18 +30,21 @@ extern int optind;
 
 struct arg_s
 {
+    char image_filename[PATH_MAX];
     char in_filename[PATH_MAX];
     char out_filename[PATH_MAX];
 
     int compression;
+    int draw_graph;
 
     int return_code;
 };
 
 static void usage(const char *av0)
 {
-    printf("Usage: %s [-h] [-c | -d] -i input_file [-o output_file]\n", av0);
+    printf("Usage: %s [-h] [-g [image_file]] [-c | -d] -i input_file [-o output_file]\n", av0);
     printf("\t-h Display this help and exit\n");
+    printf("\t-g Draw the Huffman tree into a png file with the name image_file if provided otherwise the name will be image.png\n");
     printf("\t-c Compress the input file\n");
     printf("\t-d Decompress the input file\n");
     printf("\t-i Input file name\n");
@@ -56,10 +59,20 @@ static int parse_arg(int ac, char **av, struct arg_s *arg)
 
     memset(arg, 0, sizeof(struct arg_s));
     arg->compression = -1;
-    while (arg->return_code == 0 && (opt = getopt(ac, av, "i:o:cdh")) != -1)
+    while (arg->return_code == 0 && (opt = getopt(ac, av, "g::i:o:cdh")) != -1)
     {
         switch (opt)
         {
+            case 'g':
+                if (arg->draw_graph != 0)
+                {
+                    fprintf(stderr, "You can only precise on image file at a time\n");
+                    arg->return_code = 1;
+                }
+                if (optarg != NULL)
+                    strncpy(arg->image_filename, optarg, PATH_MAX);
+                arg->draw_graph = 1;
+                break;
             case 'i':
                 if (arg->in_filename[0] != '\0')
                 {
@@ -111,14 +124,16 @@ static int parse_arg(int ac, char **av, struct arg_s *arg)
     }
     else if (arg->in_filename[0] == '\0')
         fprintf(stderr, "You must precise the input filename\n");
-    else if (arg->compression == -1)
-        fprintf(stderr, "You must select compression or decompression\n");
+    else if (arg->compression == -1 && arg->draw_graph == 0)
+        fprintf(stderr, "You must select compression/decompression or graph\n");
+    else if (arg->compression == 0 && arg->draw_graph == 1)
+        fprintf(stderr, "You cannot draw the graph of a compressed file\n");
     else if (realpath(arg->in_filename, in_path) == NULL)
         fprintf(stderr, "Error on input file '%s': %m\n", arg->in_filename);
     else if (realpath(arg->out_filename, out_path) == NULL)
     {
         if (errno != ENOENT)
-            fprintf(stderr, "Error on input file '%s': %m\n", arg->out_filename);
+            fprintf(stderr, "Error on output file '%s': %m\n", arg->out_filename);
         else
             arg->return_code = 0;
     }
@@ -127,8 +142,10 @@ static int parse_arg(int ac, char **av, struct arg_s *arg)
     else
         arg->return_code = 0;
 
-    if (arg->out_filename[0] == '\0')
+    if (arg->out_filename[0] == '\0' && arg->compression != -1)
         snprintf(arg->out_filename, PATH_MAX, "%s.%s", arg->in_filename, arg->compression ? "hc" : "hcd");
+    if (arg->draw_graph == 1 && arg->image_filename[0] == '\0')
+        strncpy(arg->image_filename, "image.png", PATH_MAX);
 
     return arg->return_code;
 }
@@ -196,6 +213,8 @@ static int start_compression(const uint8_t *mem, int size, const char *out_filen
             }
             munmap(out_mem, out_file_size);
         }
+
+        delete_tree(tree);
     }
 
     return ret;
@@ -227,7 +246,6 @@ static int start_decompression(const uint8_t *mem, int size, const char *out_fil
     return ret;
 }
 
-// XXX: Don't forget the graph
 int main(int ac, char **av)
 {
     struct arg_s arg;
@@ -244,9 +262,33 @@ int main(int ac, char **av)
         return 1;
     }
 
-    if (arg.compression)
+    if (arg.draw_graph == 1)
+    {
+        huffmantree_t *tree = get_tree_from_memory(mem, in_file_size);
+        if (tree == NULL)
+            fprintf(stderr, "Unable to create the huffman tree: %m\n");
+        else
+        {
+            char dot_name[PATH_MAX];
+            snprintf(dot_name, PATH_MAX, "%s.dot", arg.in_filename);
+            if (tree_to_graph(dot_name, tree->root) == -1)
+                fprintf(stderr, "Unable to draw the graph: %m\n");
+            else
+            {
+                char command[PATH_MAX];
+                snprintf(command, PATH_MAX, "./binarytree.sh %s %s", dot_name, arg.image_filename);
+                system(command);
+            }
+
+            unlink(dot_name);
+        }
+
+        delete_tree(tree);
+    }
+
+    if (arg.compression == 1)
         ret = start_compression(mem, in_file_size, arg.out_filename);
-    else
+    else if (arg.compression == 0)
         ret = start_decompression(mem, in_file_size, arg.out_filename);
 
     munmap(mem, in_file_size);
