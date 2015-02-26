@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Tue Feb 24 17:23:40 2015 vincent leroy
-** Last update Wed Feb 25 18:09:22 2015 vincent leroy
+** Last update Wed Feb 25 23:51:39 2015 vincent leroy
 */
 
 #include <unistd.h>
@@ -112,15 +112,14 @@ int compress(const char *filename, const huffmantree_t *tree, const char *out_fi
                 mem = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fdin, 0);
                 if (mem != MAP_FAILED)
                 {
-                    header_size = get_header_size() + tree->header.nb_leaf * SIZE_LEAF_IN_FILE;
+                    header_size = get_full_header_size(tree);
                     file_size = tree->predict_size_bytes + header_size;
                     out_mem = mmap(NULL, file_size, PROT_WRITE, MAP_SHARED, fdout, 0);
                     if (out_mem != MAP_FAILED)
                     {
                         if (posix_fallocate(fdout, 0, file_size) == 0)
                         {
-                            write_header_tree(tree, out_mem);
-                            ret = compress_memory(mem, st.st_size, tree, out_mem + header_size);
+                            ret = compress_memory(mem, st.st_size, tree, out_mem);
                             msync(out_mem, file_size, MS_SYNC);
                         }
                         munmap(out_mem, file_size);
@@ -138,6 +137,9 @@ int compress(const char *filename, const huffmantree_t *tree, const char *out_fi
 
 int compress_memory(const uint8_t *mem, int size, const huffmantree_t *tree, uint8_t *out_mem)
 {
+    write_header_tree(tree, out_mem);
+    out_mem += get_full_header_size(tree);
+
     byte_to_bit_t corres[MAX_VALUE] = {};
     tree_to_tab(tree->root, corres);
 

@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Wed Feb 25 17:33:34 2015 vincent leroy
-** Last update Wed Feb 25 18:02:26 2015 vincent leroy
+** Last update Wed Feb 25 23:19:58 2015 vincent leroy
 */
 
 #ifndef HEADER_H_
@@ -18,6 +18,8 @@
 #define MAX_VALUE                   256
 #define SIZE_LEAF_IN_FILE           (MEMBER_SIZE(huffmannode_t, weight) + MEMBER_SIZE(huffmannode_t, data))
 
+typedef struct huffmantree_s huffmantree_t;
+
 typedef struct header_s header_t;
 struct header_s
 {
@@ -26,6 +28,7 @@ struct header_s
 };
 
 uint32_t get_header_size();
+uint32_t get_full_header_size(const huffmantree_t *tree);
 int read_header(const uint8_t *mem, header_t *header, huffmannode_t *leafs[MAX_VALUE]);
 int write_header(uint8_t *out_mem, const header_t *header);
 

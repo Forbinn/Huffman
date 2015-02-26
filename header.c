@@ -5,16 +5,22 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Wed Feb 25 17:33:32 2015 vincent leroy
-** Last update Wed Feb 25 18:10:01 2015 vincent leroy
+** Last update Wed Feb 25 23:18:26 2015 vincent leroy
 */
 
 #include <string.h>
 
+#include "huffmantree.h"
 #include "header.h"
 
 uint32_t get_header_size()
 {
     return MEMBER_SIZE(header_t, padding_bits) + MEMBER_SIZE(header_t, nb_leaf);
+}
+
+uint32_t get_full_header_size(const huffmantree_t *tree)
+{
+    return get_header_size() + (tree->header.nb_leaf * SIZE_LEAF_IN_FILE);
 }
 
 int read_header(const uint8_t *mem, header_t *header, huffmannode_t *leafs[MAX_VALUE])
