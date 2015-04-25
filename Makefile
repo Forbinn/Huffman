@@ -4,23 +4,44 @@
 ## Made by vincent leroy
 ## Login   <leroy_v@epitech.eu>
 ##
-## Started on  Mon Feb 23 17:20:46 2015 vincent leroy
-## Last update Wed Feb 25 17:41:24 2015 vincent leroy
+## Started on  Sat Apr 25 21:04:18 2015 vincent leroy
+## Last update Sat Apr 25 21:13:50 2015 vincent leroy
 ##
 
-SRC			= main.c \
-			  huffmannode.c \
-			  huffmantree.c \
-			  huffman.c \
-			  treetograph.c \
-			  predictsize.c \
-			  compress.c \
-			  decompress.c \
-			  header.c \
+SRC			= src/arg_callback.c \
+			  src/compression/compression.c \
+			  src/compression/compression_threaded.c \
+			  src/crc/crc32.c \
+			  src/decompression/decompression.c \
+			  src/decompression/decompression_threaded.c \
+			  src/header/header.c \
+			  src/huffman_tree/huffman.c \
+			  src/huffman_tree/huffmannode.c \
+			  src/huffman_tree/huffmantree.c \
+			  src/io_operation.c \
+			  src/main.c \
+			  src/parse_arg/parse_arg.c \
+			  src/parse_arg/parse_error.c \
+			  src/parse_arg/parse_long_opt.c \
+			  src/parse_arg/parse_short_opt.c \
+			  src/thread_pool/future.c \
+			  src/thread_pool/pool.c \
+			  src/thread_pool/queue.c \
+			  src/thread_pool/syncqueue.c \
+			  src/thread_pool/thread.c \
 
 CFLAGS		= -Wall -Wextra
+CFLAGS		+= -pthread
+CFLAGS		+= -I include/
+CFLAGS		+= -I include/compression/
+CFLAGS		+= -I include/crc/
+CFLAGS		+= -I include/decompression/
+CFLAGS		+= -I include/header/
+CFLAGS		+= -I include/huffman_tree/
+CFLAGS		+= -I include/parse_arg/
+CFLAGS		+= -I include/thread_pool
 
-LDFLAGS		=
+LDFLAGS		= -pthread
 
 NAME		= ha
 NAME_DEBUG	= $(NAME).debug
