@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Tue Mar 31 22:23:27 2015 vincent leroy
-** Last update Sat Apr 25 20:32:22 2015 vincent leroy
+** Last update Sun Apr 26 19:41:48 2015 vincent leroy
 */
 
 #include <pthread.h>
@@ -78,6 +78,9 @@ void delete_pool(t_pool *pool)
 
     if (pool == NULL)
         return ;
+
+    for (i = 0; i < pool->nb_max_thread; ++i)
+        thread_cancel(pool->threads[i]);
 
     for (i = 0; i < pool->nb_max_thread; ++i)
         delete_thread(pool->threads[i]);

@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Fri Apr 03 17:14:37 2015 vincent leroy
-** Last update Sun Apr 12 13:43:07 2015 vincent leroy
+** Last update Sun Apr 26 19:40:33 2015 vincent leroy
 */
 
 #ifndef HEADER_H_
@@ -17,7 +17,7 @@
 #define MAGIC_NUMBER    0x8b21b552
 #define VERSION_MAJOR   1
 #define VERSION_MINOR   0
-#define VERSION_PATCH   0
+#define VERSION_PATCH   1
 
 typedef struct s_header
 {
