@@ -42,3 +42,36 @@ To decompress you can use this command line:
 
     tar -I /path/to/ha -xvf archive.tar.hc
 
+Compressed file format
+-------------------------------
+
+This table describe the format of the compressed file. The file is written in little endian order.
+
+| Name           | Size in bytes | Value          | Description               |
+| :------------- | ------------: | -------------: | :------------------------ |
+| Magic number   | 4             | 0x52B5218B     | Use to recognize the file |
+| Version major  | 1             | 1              | Current major version     |
+| Version minor  | 1             | 0              | Current minor version     |
+| Version patch  | 1             | 0              | Current patch version     |
+
+From this point **all** the fields are repeated until the end of the file (**EOF**).
+
+| Name           | Size in bytes | Value          | Description               |
+| :------------- | ------------: | -------------: | :------------------------ |
+| Block size     | 4             | --block-size   | The block size of each compressed block |
+| CRC-32         | 4             | Depends data   | This crc is computed using all the following field |
+| Number of leaf | 1             | Depends data   | Size of the Huffman tree  |
+
+The **2** following fields are repeated number of leaf times.
+
+| Name           | Size in bytes | Value          | Description               |
+| :------------- | ------------: | -------------: | :------------------------ |
+| Weight         | 4             | Depends data   | Number of character in the block-size |
+| Byte value     | 1             | 0 - 255        | Character corresponding to the weight |
+
+| Name           | Size in bytes | Value          | Description               |
+| :------------- | ------------: | -------------: | :------------------------ |
+| Padding        | 1             | 0 - 7          | Number of padding bits at the end of the compressed memory |
+| Memory size    | 4             | 0 - Block size | Size of the following compressed memory |
+| Data           | memory size   | Depends data   | Compressed data           |
+
