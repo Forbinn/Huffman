@@ -52,7 +52,7 @@ This table describe the format of the compressed file. The file is written in li
 | Magic number   | 4             | 0x52B5218B     | Use to recognize the file |
 | Version major  | 1             | 1              | Current major version     |
 | Version minor  | 1             | 0              | Current minor version     |
-| Version patch  | 1             | 0              | Current patch version     |
+| Version patch  | 1             | 1              | Current patch version     |
 
 From this point **all** the fields are repeated until the end of the file (**EOF**).
 
