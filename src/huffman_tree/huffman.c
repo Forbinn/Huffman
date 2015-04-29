@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Mon Feb 23 23:25:05 2015 vincent leroy
-** Last update Sat Apr 25 20:28:09 2015 vincent leroy
+** Last update Wed Apr 29 13:44:13 2015 vincent leroy
 */
 
 #include <stdlib.h>
@@ -14,7 +14,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 
 #include "huffman.h"
 
@@ -135,25 +134,6 @@ t_huffmantree* get_tree_from_file_read(int fd, uint64_t block_size)
         return NULL;
 
     return get_tree_from_leaf(queue);
-}
-
-t_huffmantree* get_tree_from_file_mmap(int fd)
-{
-    struct stat st;
-    uint8_t *mem;
-    t_huffmantree *tree = NULL;
-
-    if (fstat(fd, &st) != -1)
-    {
-        mem = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-        if (mem != MAP_FAILED)
-        {
-            tree = get_tree_from_memory(mem, st.st_size);
-            munmap(mem, st.st_size);
-        }
-    }
-
-    return tree;
 }
 
 t_huffmantree* get_tree_from_memory(const uint8_t *mem, uint64_t size)
