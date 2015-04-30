@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Sun Apr 05 16:28:32 2015 vincent leroy
-** Last update Sat Apr 11 19:07:01 2015 vincent leroy
+** Last update Thu Apr 30 15:34:57 2015 vincent leroy
 */
 
 #include <stdio.h>
@@ -158,5 +158,15 @@ bool set_decompress(const char *option, const char *arg, void *userdata)
 
     int *compression = (int*)userdata;
     *compression = 0;
+    return true;
+}
+
+bool set_test(const char *option, const char *arg, void *userdata)
+{
+    (void)option;
+    (void)arg;
+
+    int *test_integrity = (int*)userdata;
+    *test_integrity = 1;
     return true;
 }

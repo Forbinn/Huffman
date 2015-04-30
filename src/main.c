@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Tue Mar 31 20:35:41 2015 vincent leroy
-** Last update Sat Apr 25 21:03:53 2015 vincent leroy
+** Last update Thu Apr 30 15:41:12 2015 vincent leroy
 */
 
 #include <stdio.h>
@@ -45,6 +45,7 @@ static bool usage(const char *option, const char *arg, void *userdata)
     printf("\t-t,--thread number    Uses a maximum of number thread (default: number of core)\n");
     printf("\t--block-size=size     Set the block size (default: 10MB)\n");
     printf("\t--memlimit=size       Set the maximum memory use to the value size (default: 100MB)\n");
+    printf("\t-i,--test             Test the archive integrity\n");
     printf("\n");
     printf("All the size must be suffixed by kB, MB or GB\n");
     return false;
@@ -201,6 +202,7 @@ char* bytes_to_standard_form(uint64_t bytes)
 
 int main(int ac, char **av)
 {
+    int test_integrity = 0;
     int thread_number = number_of_cores();
     uint32_t block_size = 10 * 1024 * 1024;
     uint64_t max_memory = 10 * block_size;
@@ -217,6 +219,7 @@ int main(int ac, char **av)
         {'d',  "decompress", NO_ARG,       &set_decompress,      &compression},
         {'\0', "block-size", REQUIRED_ARG, &set_block_size,      &block_size},
         {'\0', "memlimit",   REQUIRED_ARG, &set_memlimit,        &max_memory},
+        {'i',  "test",       NO_ARG,       &set_test,            &test_integrity},
         {'\0', NULL,         NO_ARG,       NULL,                 NULL}
     };
 
@@ -236,6 +239,9 @@ int main(int ac, char **av)
                 fprintf(stderr, "Option required a argument\n");
                 usage(NULL, NULL, av[0]);
                 break;
+            case INVALID_ARG:
+                fprintf(stderr, "Duplicate %s option at index %d\n", error.is_short_arg ? "short" : "long", error.idx);
+                break;
             default:
                 break;
         }
@@ -250,6 +256,12 @@ int main(int ac, char **av)
 
     if (ac > 1)
         filename = av[1];
+
+    if (test_integrity == 1) // Throw away the result
+    {
+        compression = 0;
+        out_filename = "/dev/null";
+    }
 
     int ret;
     if ((ret = check_in_out_filename(filename, out_filename)) == EXIT_FAILURE)
