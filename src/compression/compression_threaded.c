@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Fri Apr 03 16:24:16 2015 vincent leroy
-** Last update Sat Apr 25 21:04:42 2015 vincent leroy
+** Last update Thu Apr 30 14:28:10 2015 vincent leroy
 */
 
 #include <stdlib.h>
@@ -121,7 +121,6 @@ t_c_error compress_with_thread(const t_c_thread_param *param, c_input in, c_outp
             free(compress_arg);
             break;
         }
-
 
         t_future *future = pool_submit_task(pool, &compress_thread, compress_arg);
         queue_enqueue(queue, future);

@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Sun Apr 05 16:33:02 2015 vincent leroy
-** Last update Sat Apr 25 20:28:45 2015 vincent leroy
+** Last update Thu Apr 30 14:32:35 2015 vincent leroy
 */
 
 #include <stdlib.h>
@@ -18,9 +18,17 @@
 uint32_t read_raw_data(t_compress_arg *arg, void *userdata)
 {
     int fd = *(int*)userdata;
-    ssize_t size_read = read(fd, arg->mem, arg->mem_size);
-    if (size_read == (ssize_t)-1)
-        return(uint32_t)-1;
+    uint32_t size_read = 0;
+    while (size_read < arg->mem_size)
+    {
+        ssize_t tmp = read(fd, arg->mem, arg->mem_size);
+        if (tmp == (ssize_t)-1)
+            return (uint32_t)-1;
+        else if (tmp == 0)
+            break;
+
+        size_read += tmp;
+    }
 
     arg->mem_size = size_read;
     return size_read;
