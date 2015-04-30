@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Mon Aug 18 18:12:11 2014 vincent leroy
-** Last update Mon Mar 30 22:49:01 2015 vincent leroy
+** Last update Thu Apr 30 14:57:57 2015 vincent leroy
 */
 
 #ifndef PARSE_ERROR_H_
@@ -18,7 +18,8 @@ typedef enum error_type
     NO_ERROR        = 0,
     UNKNOWN_OPT     = 1,
     ARG_NOT_PROVIDE = 2,
-    CALLBACK_ERROR  = 3
+    CALLBACK_ERROR  = 3,
+    INVALID_ARG     = 4
 } error_type;
 
 typedef struct opt_error

@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Mon Aug 18 14:24:44 2014 vincent leroy
-** Last update Sat Apr 25 20:30:59 2015 vincent leroy
+** Last update Thu Apr 30 15:20:13 2015 vincent leroy
 */
 
 #include <stdlib.h>
@@ -29,6 +29,57 @@ static void _remove_option_in_av(int *ac, char ***av, int *idx_in_av_for_remove,
         for (j = i + 1; j < size_of_tab; ++j)
             --idx_in_av_for_remove[j];
     }
+}
+
+static int check_opts_arg(const opts options[], opt_error *error)
+{
+    char array[256] = {};
+    int err = 0;
+    int err_idx = -1;
+    int i;
+    int j;
+
+    for (i = 0; options[i].cb != NULL && err == 0; ++i)
+    {
+        if (options[i].short_opt != '\0')
+        {
+            if (array[(unsigned char)options[i].short_opt] == 1)
+            {
+                err = 1;
+                err_idx = i;
+                break;
+            }
+
+            array[(unsigned char)options[i].short_opt] = 1;
+        }
+
+        if (options[i].long_opt != NULL)
+            for (j = i + 1; options[j].cb != NULL; ++j)
+            {
+                if (options[j].long_opt == NULL)
+                    continue;
+
+                if (strcmp(options[i].long_opt, options[j].long_opt) == 0)
+                {
+                    err = 2;
+                    err_idx = j;
+                    break;
+                }
+            }
+    }
+
+    if (err != 0)
+    {
+        if (error != NULL)
+        {
+            error->err_type = INVALID_ARG;
+            error->is_short_arg = ((err == 1) ? 1 : 0);
+            error->idx = err_idx;
+        }
+        return -1;
+    }
+
+    return 0;
 }
 
 int _do_parse(char **argv, int i, int off, const opts options[], opt_error *error, int *idx_in_av_for_remove, int *idx_in_tab, int (*parse_func)(const char*, const char*[], const opts[], opt_error*))
@@ -59,6 +110,9 @@ int parse_arg(int *ac, char ***av, const opts options[], opt_error *error)
     int *idx_in_av_for_remove;
     int idx_in_tab = 0;
     char **argv = *av;
+
+    if (check_opts_arg(options, error) == -1)
+        return -1;
 
     idx_in_av_for_remove = calloc(*ac, sizeof(int));
     clear_parse_error(error);
