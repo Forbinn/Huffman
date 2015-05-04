@@ -5,7 +5,7 @@
 ** Login  <leroy_v@epitech.eu>
 **
 ** Started on  Sun Apr 05 16:28:32 2015 vincent leroy
-** Last update Thu Apr 30 15:34:57 2015 vincent leroy
+** Last update Mon May 04 14:07:42 2015 vincent leroy
 */
 
 #include <stdio.h>
@@ -14,8 +14,39 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <limits.h>
+#include <sys/types.h>
+#if !defined(linux) && !defined(__linux) && !defined(__linux__)
+    #include <sys/sysctl.h>
+#endif
 
 #include "arg_callback.h"
+
+static uint64_t getAvailableMemory()
+{
+    static uint64_t size = 0;
+
+#if defined(linux) || defined(__linux) || defined(__linux__)
+    if (size == 0)
+    {
+        long page_size = 0;
+        long page_count = 0;
+
+        page_size = sysconf(_SC_PAGESIZE);
+        page_count = sysconf(_SC_PHYS_PAGES);
+        size = page_size * page_count;
+    }
+#else
+    if (size == 0)
+    {
+        int mib[2] = {CTL_HW, HW_MEMSIZE};
+        size_t len = sizeof(size);
+
+        sysctl(mib, 2, &size, &len, NULL, 0);
+    }
+#endif
+
+    return size;
+}
 
 bool set_block_size(const char *option, const char *arg, void *userdata)
 {
@@ -54,7 +85,7 @@ bool set_block_size(const char *option, const char *arg, void *userdata)
     if (page_count == 0)
         page_count = sysconf(_SC_PHYS_PAGES);
 
-    if ((tmp / page_size) >= page_count)
+    if (tmp >= getAvailableMemory())
     {
         if (option != NULL)
             fprintf(stderr, "The block size requested is greater than the memory size\n");
