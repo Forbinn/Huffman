@@ -5,10 +5,6 @@
 PROGNAME="./ha"
 # Program extra arguments (all the arguments except the input and output files)
 PROGARG="--block-size=10MB --memlimit=1GB --thread=4"
-# Option to pass to the program to set the input file
-INOPTION=""
-# Option to pass to the program to set the output file
-OUTOPTION="-o"
 # Text file (the test is skip if it is empty)
 TEXTFILE="Makefile"
 # Audio file (the test is skip if it is empty)
@@ -74,7 +70,7 @@ test_file() {
     do
         echo -en "\rTest number $i / ${NBTEST}"
         start_measuring_time
-        ${PROGNAME} ${PROGARG} ${INOPTION} "$1" ${OUTOPTION} "${outfile}" > /dev/null
+        ${PROGNAME} ${PROGARG} < "$1" > "${outfile}"
         ret=$?
         stop_measuring_time
 
@@ -104,7 +100,7 @@ test_file() {
 
     echo
     echo
-    echo -e "${WHITE}Result for $2 file${DEFAULT}"
+    echo -e "${WHITE}Result for $2 file: '$1'${DEFAULT}"
     echo -e "${WHITE}Total time: ${total} ms${DEFAULT}"
     echo -e "${WHITE}Average time: $(expr ${total} / ${NBTEST}) ms${DEFAULT}"
     echo -e "${WHITE}File size: ${filesize} B (${filesizebyte})${DEFAULT}"
@@ -113,15 +109,14 @@ test_file() {
     echo -e "${WHITE}Compression speed: ${bytepersec} B / sec (${bytepersecbyte} / sec)${DEFAULT}"
 }
 
-executable=$(which "${PROGNAME}")
-if [ $? -ne 0 ]; then
-    if [ ! -x ${PROGNAME} ]; then
-        echo -e "${RED}${PROGNAME} is not executable${DEFAULT}"
-        exit 1
-    fi
-else
-    PROGNAME="${executable}"
+echo -en "${RED}"
+tmp=$(which "${PROGNAME}")
+ret=$?
+echo -en "${DEFAULT}"
+if [ ${ret} -ne 0 ]; then
+    exit 1
 fi
+PROGNAME=${tmp}
 
 echo -n "Testing program '${PROGNAME}'"
 if [ ! -z "${PROGARG}" ]; then
